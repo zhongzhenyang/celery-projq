@@ -1,0 +1,27 @@
+@base_uri =http://localhost:5555/api
+
+
+###
+GET {{base_uri}}/workers
+
+###
+GET {{base_uri}}/task/types
+
+###
+POST  {{base_uri}}/task/async-apply/add
+Accept:  application/json
+
+{
+    "args": [2,4]
+}
+
+###
+POST {{base_uri}}/task/async-apply/foo
+Accept:  application/json
+
+{
+    "args": ["hello"]
+}
+
+###
+GET  {{base_uri}}/task/result/dbb51163-33ad-44ee-9647-1e9ad975c2da
