@@ -1,0 +1,16 @@
+version: '3.7'
+services:
+  flower:  
+    image: mher/flower:0.9.5
+    command: ["flower", "--broker=redis://redis-6.0:6379/0", "--port=8888"]
+    volumes:
+        - "./data:/data"
+    ports:  
+      - 8888:8888
+    networks:
+      - default
+      - redis_net
+
+networks:
+    redis_net:
+      external: true

@@ -10,9 +10,10 @@ celery -A celery-projq.celery_app shell
 ```
 
 ### start flower
-require celery 4.4.7
 
-celery >5 has bug
+celery >5 has bug, so use docker
 ```
-flower -A celery-projq.celery_app --port=5555
+docker network create redis_net
+docker network connect redis_net redis-6.0
+docker-comppose up -d
 ```
