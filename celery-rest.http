@@ -1,27 +1,50 @@
-@base_uri =http://localhost:5555/api
+@base_uri=http://localhost:5555/api
+@username=admin
+@password=secret
 
 
 ###
 GET {{base_uri}}/workers
+Authorization: Basic {{username}}:{{password}}
 
 ###
 GET {{base_uri}}/task/types
+Authorization: Basic {{username}}:{{password}}
 
 ###
-POST  {{base_uri}}/task/async-apply/add
-Accept:  application/json
+GET {{base_uri}}/tasks
+Authorization: Basic {{username}}:{{password}}
+
+###
+POST {{base_uri}}/task/send-task/add
+Authorization: Basic {{username}}:{{password}}
+Accept:application/json
 
 {
-    "args": [2,4]
+    "args": [2,5]
 }
 
 ###
-POST {{base_uri}}/task/async-apply/foo
-Accept:  application/json
+POST {{base_uri}}/task/send-task/foo
+Authorization: Basic {{username}}:{{password}}
+Accept:application/json
 
 {
     "args": ["hello"]
 }
 
 ###
-GET  {{base_uri}}/task/result/dbb51163-33ad-44ee-9647-1e9ad975c2da
+POST {{base_uri}}/task/async-apply/add
+Authorization: Basic {{username}}:{{password}}
+Accept:application/json
+
+{
+    "args": [22,26],
+    "task_id": "some-id:003",
+    "eta": "2020-10-28 07:45:00.000"
+    
+}
+
+###
+GET  {{base_uri}}/task/result/some-id:003
+Authorization: Basic {{username}}:{{password}}

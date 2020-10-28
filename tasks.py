@@ -26,14 +26,10 @@ def register(category, name):
 @app.task(name='add')
 # @register('foo', 'add')
 def add(x, y):
-    # if (x + y) % 2 == 0:
-    #     raise RuntimeError("x+y is even", x, y)
-    try:
-        if x == 1:
-            raise RuntimeError("my error")
-        return x + y
-    except Exception:
-        logger.error("x=%s, y=%s", x, y, exc_info=True)
+    if x == 1:
+        raise RuntimeError("my error")
+    return x + y
+
 
 
 @app.task(name='foo')
