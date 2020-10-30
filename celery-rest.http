@@ -46,5 +46,21 @@ Accept:application/json
 }
 
 ###
+POST {{base_uri}}/task/async-apply/add
+Authorization: Basic {{username}}:{{password}}
+Accept:application/json
+
+{
+    "args": [1,26],
+    "countdown": 30
+    
+}
+
+
+###
 GET  {{base_uri}}/task/result/some-id:003
+Authorization: Basic {{username}}:{{password}}
+
+###
+GET {{base_uri}}/task/info/9c81bd1e-4259-40e3-8586-4e458b6dd094
 Authorization: Basic {{username}}:{{password}}

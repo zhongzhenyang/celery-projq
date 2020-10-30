@@ -31,6 +31,10 @@ def add(x, y):
     return x + y
 
 
+@app.task(name="add3")
+def add3(a, b=10, c=20):
+    return a + b + c
+
 
 @app.task(name='foo')
 def foo(x):
