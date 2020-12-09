@@ -19,5 +19,5 @@ docker-comppose up -d
 ```
 or install celery==4.4.6,flower==0.9.5
 ```
-flower -A celery-projq.celery_app --port=5555
+flower -A celery-projq.celery_app --port=5555 --basic_auth=admin:secret
 ```

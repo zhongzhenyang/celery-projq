@@ -1,10 +1,13 @@
 # coding=utf-8
 from __future__ import absolute_import
-
+import os
 from celery import Celery, bootsteps
-from celery.signals import after_task_publish, task_success, task_prerun, task_postrun, task_failure
+from celery.signals import after_task_publish, task_success, task_prerun, task_postrun, task_failure, \
+    worker_process_init, worker_process_shutdown
 
 from kombu import Queue, Exchange
+from kafka import KafkaProducer
+import json
 
 default_queue_name = 'default'
 default_exchange_name = 'default'
@@ -22,6 +25,8 @@ deadletter_routing_key = default_routing_key + "." + deadletter_suffix
 
 app = Celery('projq', include=['celery-projq.tasks'])
 app.config_from_object('celery-projq.celeryconfig')
+
+producer = None
 
 
 class DeclareDLXnDLQ(bootsteps.StartStopStep):
@@ -41,6 +46,22 @@ class DeclareDLXnDLQ(bootsteps.StartStopStep):
 
         with worker.app.pool.acquire() as conn:
             dead_letter_queue.bind(conn).declare()
+
+
+@worker_process_init.connect
+def init_worker(**kwargs):
+    global producer
+    producer = KafkaProducer(bootstrap_servers=['localhost:9092'],
+                             value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+    print(f"{os.getpid()} init worker and create kafka producer")
+
+
+@worker_process_shutdown.connect
+def shutdown_worker(**kwargs):
+    global producer
+    if producer:
+        print(f"{os.getpid()} shutdown worker and close kafka producer")
+        producer.close()
 
 
 @after_task_publish.connect
@@ -110,7 +131,8 @@ def on_task_postrun(signal=None, sender=None, task_id=None, task=None, retval=No
 
 
 @task_success.connect
-def on_task_success(signal=None, sender=None, result=None, **kwargs):
+def on_task_success(signal=None, sender=None, task_id=None, result=None, **kwargs):
+    global producer
     '''
     task_success signal:<Signal: task_success providing_args={'result'}>
     task_success sender:<@task: add of projq at 0x7fb91fb98400>
@@ -122,6 +144,12 @@ def on_task_success(signal=None, sender=None, result=None, **kwargs):
     print(f"task_success sender:{sender}")
     print(f"task_success result:{result}")
     print(f"task_success kwargs:{kwargs}")
+
+    if sender.name == 'add':
+        print(f"pid: {os.getpid()}")
+        message = {"taskId": task_id, "state": "SUCCESS", "result": result}
+        future = producer.send('celery_signal', message)
+    # print(future.get())
 
 
 @task_failure.connect

@@ -25,6 +25,7 @@ def register(category, name):
 
 @app.task(name='add')
 # @register('foo', 'add')
+# @app.task
 def add(x, y):
     if x == 1:
         raise RuntimeError("my error")
